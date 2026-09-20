@@ -18,6 +18,7 @@ const personJsonLd = {
   email: `mailto:${profile.email}`,
   telephone: profile.phone,
   url: profile.website,
+  sameAs: [`https://t.me/${profile.telegram}`],
   address: {
     "@type": "PostalAddress",
     addressLocality: "Krong Takhmau",

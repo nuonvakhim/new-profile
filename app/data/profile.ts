@@ -8,7 +8,8 @@ export const profile = {
   location: "Krong Takhmau, Kandal Province, Cambodia",
   email: "vakhimnuon@gmail.com",
   phone: "+855 96 553 1965",
-  website: "https://nuonvakhim.vercel.app",
+  telegram: "vakhimnuon",
+  website: "https://vakhim-dev.site",
   stats: [
     { value: "3+", label: "Years building software" },
     { value: "Java", label: "Primary stack" },

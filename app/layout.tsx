@@ -13,31 +13,63 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const pageTitle = `${profile.name} — ${profile.role}`;
+
 export const metadata: Metadata = {
+  // Relative URLs below — the canonical, and the generated OG image — resolve
+  // against this, so it has to stay absolute.
   metadataBase: new URL(profile.website),
-  title: `${profile.name} — ${profile.role}`,
+  title: {
+    default: pageTitle,
+    // Used if this ever grows past a single page.
+    template: `%s — ${profile.name}`,
+  },
   description: profile.tagline,
+  applicationName: `${profile.name} — Portfolio`,
   keywords: [
     "Nuon Vakhim",
     "Software Developer",
     "Software Engineer",
+    "Backend Engineer",
     "Java",
     "Spring Boot",
     "PostgreSQL",
+    "Microservices",
+    "REST API",
     "Next.js",
     "Cambodia",
+    "Phnom Penh",
   ],
   authors: [{ name: profile.name, url: profile.website }],
+  creator: profile.name,
+  publisher: profile.name,
+  category: "technology",
+  alternates: { canonical: "/" },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      // Let Google use the full-size OG image and an untruncated snippet.
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
     type: "profile",
-    title: `${profile.name} — ${profile.role}`,
+    firstName: "Vakhim",
+    lastName: "Nuon",
+    username: profile.telegram,
+    title: pageTitle,
     description: profile.tagline,
     url: profile.website,
     siteName: profile.name,
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${profile.name} — ${profile.role}`,
+    title: pageTitle,
     description: profile.tagline,
   },
 };

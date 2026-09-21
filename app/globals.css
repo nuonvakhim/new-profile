@@ -7,32 +7,47 @@
 :root {
   --background: #fbfbf9;
   --surface: #ffffff;
+  --surface-2: #f5f5f1;
   --border: #e5e3dd;
   --foreground: #16181d;
   --muted: #5c6068;
   --accent: #0d9488;
+  --accent-2: #4f46e5;
   --accent-soft: #ccfbf1;
   --grid: rgba(22, 24, 29, 0.05);
+  /* Cursor-follow highlight on cards, and the two hero glows. */
+  --spot: rgba(13, 148, 136, 0.13);
+  --glow-a: rgba(13, 148, 136, 0.16);
+  --glow-b: rgba(79, 70, 229, 0.11);
+  --noise-opacity: 0.035;
 }
 
 .dark {
   --background: #0a0d12;
   --surface: #11161e;
+  --surface-2: #161c26;
   --border: #212936;
   --foreground: #e8eaee;
   --muted: #98a0ae;
   --accent: #2dd4bf;
+  --accent-2: #818cf8;
   --accent-soft: rgba(45, 212, 191, 0.12);
   --grid: rgba(232, 234, 238, 0.045);
+  --spot: rgba(45, 212, 191, 0.14);
+  --glow-a: rgba(45, 212, 191, 0.16);
+  --glow-b: rgba(129, 140, 248, 0.14);
+  --noise-opacity: 0.05;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
   --color-border: var(--border);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
   --color-accent-soft: var(--accent-soft);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -41,6 +56,10 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* The hero backdrop is full-bleed at 100vw, which is a scrollbar-width
+       wider than the page; clip that off without creating a scroll container
+       (which would break the sticky nav). */
+    overflow-x: clip;
     /* Offset anchor jumps so headings clear the sticky nav. */
     scroll-padding-top: 5.5rem;
   }
@@ -68,6 +87,8 @@
   }
 }
 
+/* ---------------------------------------------------------------- backdrop */
+
 /* Faint blueprint grid used behind the hero. */
 .grid-backdrop {
   background-image:
@@ -77,8 +98,160 @@
   mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
 }
 
-/* Scroll-reveal. Gated on `.js`, which the inline script in layout.tsx adds —
-   without JS nothing is ever hidden, so content is never lost. */
+/* Soft colour bloom behind the hero. Two slowly drifting blurred discs — cheap
+   to composite because only `transform` animates. */
+.orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(72px);
+  will-change: transform;
+}
+
+.orb-a {
+  background: var(--glow-a);
+  animation: drift-a 18s ease-in-out infinite alternate;
+}
+
+.orb-b {
+  background: var(--glow-b);
+  animation: drift-b 22s ease-in-out infinite alternate;
+}
+
+@keyframes drift-a {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(6%, 8%, 0) scale(1.12); }
+}
+
+@keyframes drift-b {
+  from { transform: translate3d(0, 0, 0) scale(1.08); }
+  to   { transform: translate3d(-8%, -6%, 0) scale(1); }
+}
+
+/* Film grain over the whole page — takes the flatness off large colour fields. */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: var(--noise-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ------------------------------------------------------------------ accents */
+
+.text-gradient {
+  background-image: linear-gradient(
+    115deg,
+    var(--foreground) 0%,
+    var(--foreground) 38%,
+    var(--accent) 72%,
+    var(--accent-2) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.rule-gradient {
+  background-image: linear-gradient(to right, var(--accent), var(--accent-2), transparent);
+}
+
+/* ------------------------------------------------------------- card effects */
+
+/* Cards opt in with `card-fx`. `::before` is the cursor-follow highlight (the
+   Spotlight wrapper writes --mx/--my), `::after` is a gradient hairline edge.
+   Both are inert until the pointer is over the card. */
+.card-fx {
+  position: relative;
+  isolation: isolate;
+}
+
+.card-fx > * {
+  position: relative;
+  z-index: 1;
+}
+
+.card-fx::before,
+.card-fx::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.card-fx::before {
+  background: radial-gradient(
+    240px circle at var(--mx, 50%) var(--my, 50%),
+    var(--spot),
+    transparent 72%
+  );
+}
+
+.card-fx::after {
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    transparent 42%,
+    transparent 58%,
+    var(--accent-2)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.card-fx[data-active="true"]::before,
+.card-fx[data-active="true"]::after,
+.card-fx:focus-within::after {
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------- marquee */
+
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 48s linear infinite;
+}
+
+.marquee-mask:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+/* -------------------------------------------------------------- terminal */
+
+.caret {
+  animation: caret 1.1s steps(1) infinite;
+}
+
+@keyframes caret {
+  0%, 50%   { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+/* ------------------------------------------------------- scroll reveal */
+
+/* Gated on `.js`, which the inline script in layout.tsx adds — without JS
+   nothing is ever hidden, so content is never lost. */
 .js .reveal {
   opacity: 0;
   transform: translateY(18px);
@@ -97,5 +270,12 @@
     opacity: 1;
     transform: none;
     transition: none;
+  }
+
+  .orb-a,
+  .orb-b,
+  .marquee-track,
+  .caret {
+    animation: none;
   }
 }

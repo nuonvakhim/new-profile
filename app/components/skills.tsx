@@ -1,5 +1,7 @@
-import { skillGroups } from "@/app/data/profile";
+import { skillGroups, techTicker } from "@/app/data/profile";
+import { Marquee } from "./marquee";
 import { Reveal } from "./reveal";
+import { Spotlight } from "./spotlight";
 import { Section } from "./ui";
 
 export function Skills() {
@@ -10,10 +12,10 @@ export function Skills() {
       title="Skills"
       lead="The stack I reach for."
     >
-      <div className="grid gap-4 sm:grid-cols-2">
+      <Spotlight className="grid gap-4 sm:grid-cols-2">
         {skillGroups.map((group, i) => (
-          <Reveal key={group.title} delay={i * 70}>
-            <div className="h-full rounded-xl border border-border bg-surface p-5 transition-colors hover:border-accent/50">
+          <Reveal key={group.title} delay={i * 70} className="h-full">
+            <div className="card-fx h-full rounded-xl border border-border bg-surface p-5">
               <h3 className="mb-4 font-mono text-xs tracking-widest text-accent uppercase">
                 {group.title}
               </h3>
@@ -30,7 +32,11 @@ export function Skills() {
             </div>
           </Reveal>
         ))}
-      </div>
+      </Spotlight>
+
+      <Reveal className="mt-10">
+        <Marquee items={techTicker} />
+      </Reveal>
     </Section>
   );
 }

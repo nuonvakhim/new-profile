@@ -6,13 +6,34 @@ import { profile, sections } from "@/app/data/profile";
 export function SiteNav() {
   const [active, setActive] = useState<string>("");
   const [scrolled, setScrolled] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Scroll position drives both the nav's backdrop and the progress rule under
+  // it. rAF keeps a fast-firing scroll event from re-rendering every frame.
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
+    let frame = 0;
+
+    const measure = () => {
+      frame = 0;
+      const y = window.scrollY;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      setScrolled(y > 24);
+      setProgress(max > 0 ? Math.min(y / max, 1) : 0);
+    };
+
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+
+    measure();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
   }, []);
 
   // Highlight the section currently nearest the top of the viewport.
@@ -50,16 +71,19 @@ export function SiteNav() {
     <header
       className={`sticky top-0 z-50 transition-colors duration-300 ${
         scrolled
-          ? "border-b border-border bg-background/80 backdrop-blur-xl"
+          ? "border-b border-border bg-background/70 backdrop-blur-xl"
           : "border-b border-transparent"
       }`}
     >
-      <nav className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between px-6">
+      <nav className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-6">
         <a
           href="#top"
-          className="font-mono text-sm font-medium tracking-tight text-foreground"
+          className="group font-mono text-sm font-medium tracking-tight text-foreground"
         >
-          <span className="text-accent">/</span> {profile.name.toLowerCase().replace(" ", "-")}
+          <span className="text-accent transition-transform group-hover:text-accent-2">
+            /
+          </span>{" "}
+          {profile.name.toLowerCase().replace(" ", "-")}
         </a>
 
         <div className="flex items-center gap-1">
@@ -69,7 +93,7 @@ export function SiteNav() {
                 <a
                   href={`#${id}`}
                   aria-current={active === id ? "true" : undefined}
-                  className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
+                  className={`relative rounded-full px-3 py-1.5 text-sm transition-colors ${
                     active === id
                       ? "bg-accent-soft text-accent"
                       : "text-muted hover:text-foreground"
@@ -123,6 +147,13 @@ export function SiteNav() {
           ))}
         </ul>
       )}
+
+      {/* How far down the page you are, drawn along the nav's bottom edge. */}
+      <span
+        aria-hidden
+        className="rule-gradient absolute inset-x-0 bottom-0 h-px origin-left"
+        style={{ transform: `scaleX(${progress})` }}
+      />
     </header>
   );
 }

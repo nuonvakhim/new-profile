@@ -44,13 +44,13 @@ export function Contact() {
       lead="Open to backend and full-stack roles — let's talk."
     >
       <Reveal>
-        <dl className="grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2">
+        <dl className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2">
           {channels.map((channel, i) => (
             <div
               key={channel.label}
               // An odd channel count would leave a bare gap in the two-column
               // grid, so the last one stretches across it.
-              className={`bg-surface px-5 py-4 ${
+              className={`group bg-surface px-5 py-4 transition-colors hover:bg-surface-2 ${
                 i === channels.length - 1 && channels.length % 2 === 1
                   ? "sm:col-span-2"
                   : ""
@@ -63,12 +63,18 @@ export function Contact() {
                 {channel.href ? (
                   <a
                     href={channel.href}
-                    className="text-foreground transition-colors hover:text-accent"
+                    className="inline-flex items-center gap-1.5 text-foreground transition-colors hover:text-accent"
                     {...(channel.external
                       ? { target: "_blank", rel: "noreferrer" }
                       : {})}
                   >
                     {channel.value}
+                    <span
+                      aria-hidden
+                      className="text-accent opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100"
+                    >
+                      →
+                    </span>
                   </a>
                 ) : (
                   <span className="text-foreground">{channel.value}</span>
@@ -82,7 +88,7 @@ export function Contact() {
       <Reveal delay={100}>
         <a
           href={`mailto:${profile.email}`}
-          className="mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+          className="group mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-background transition-all hover:shadow-lg hover:shadow-accent/30"
         >
           Send me an email
           <svg
@@ -95,6 +101,7 @@ export function Contact() {
             strokeLinecap="round"
             strokeLinejoin="round"
             aria-hidden
+            className="transition-transform group-hover:translate-x-0.5"
           >
             <path d="M5 12h14M13 6l6 6-6 6" />
           </svg>

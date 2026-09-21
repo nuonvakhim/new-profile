@@ -1,14 +1,15 @@
 import { education } from "@/app/data/profile";
 import { Reveal } from "./reveal";
+import { Spotlight } from "./spotlight";
 import { Section } from "./ui";
 
 export function Education() {
   return (
     <Section id="education" index="05" title="Education" lead="Where I trained.">
-      <div className="grid gap-4 sm:grid-cols-2">
+      <Spotlight className="grid gap-4 sm:grid-cols-2">
         {education.map((entry, i) => (
-          <Reveal key={entry.credential} delay={i * 70}>
-            <div className="h-full rounded-xl border border-border bg-surface p-6">
+          <Reveal key={entry.credential} delay={i * 70} className="h-full">
+            <div className="card-fx h-full rounded-xl border border-border bg-surface p-6">
               <p className="font-mono text-xs tracking-wide text-accent">
                 {entry.period}
               </p>
@@ -19,7 +20,7 @@ export function Education() {
             </div>
           </Reveal>
         ))}
-      </div>
+      </Spotlight>
     </Section>
   );
 }

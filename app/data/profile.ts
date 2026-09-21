@@ -160,3 +160,51 @@ export const sections = [
   { id: "education", label: "Education" },
   { id: "contact", label: "Contact" },
 ] as const;
+
+/** Phrases the hero cycles through under the name. */
+export const heroRoles = [
+  "Software Developer",
+  "Backend Engineer",
+  "Microservices & REST APIs",
+  "Java · Spring Boot · PostgreSQL",
+] as const;
+
+/** The hero's request/response card — a self-description in the shape of work. */
+export const heroPayload = {
+  method: "GET",
+  path: "/api/developers/nuon-vakhim",
+  status: "200 OK",
+  time: "38ms",
+  body: [
+    { key: "role", value: '"Software Developer"' },
+    { key: "focus", value: '["backend", "frondend", "microservices"]' },
+    { key: "stack", value: '["Java", "Spring Boot", "PostgreSQL", "Next.JS]' },
+    { key: "experience_years", value: "3" },
+    { key: "location", value: '"Phnom Penh, KH"' },
+    { key: "available", value: "true" },
+  ],
+} as const;
+
+/** Flat technology list for the scrolling ticker under the skills grid. */
+export const techTicker = [
+  "Java",
+  "Spring Boot",
+  "PostgreSQL",
+  "Docker",
+  "Microservices",
+  "REST APIs",
+  "Spring Security",
+  "JWT",
+  "Next.js",
+  "React.js",
+  "TypeScript",
+  "Golang",
+  "Jenkins",
+  "Swagger",
+  "MySQL",
+  "Vue.js",
+  "PHP",
+  "Git",
+  "CI/CD",
+  "JasperReports",
+] as const;
